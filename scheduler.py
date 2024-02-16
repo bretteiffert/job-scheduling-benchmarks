@@ -1,6 +1,11 @@
 #data dict
 #jobs: (opps, curr_opp, time)
 #machines: (job, time)
+import time
+from operator import itemgetter
+
+import sys
+
 
 result = []
 
@@ -25,7 +30,7 @@ def lines_to_lists(filename):
     return job_list
 
 def schedule():
-    jobs = lines_to_lists("M001_J001-00")
+    jobs = lines_to_lists(sys.argv[1])
 
     metadata = jobs.pop(0)
     num_jobs = int(metadata[0][0][0])
@@ -45,6 +50,8 @@ def schedule():
                 counter = counter + 1
         for m in range(0, num_machines):
             if machines[m][0]:
+                sorted_machine_ops = sorted(machines[m][0], key=itemgetter(1))
+                machines[m][0] = sorted_machine_ops
                 for i in range(0, len(machines[m][0])):
                     opp = machines[m][0].pop(0)
                     job_id = opp[0] #job_id
@@ -55,16 +62,20 @@ def schedule():
                     if machines[m][1] <= comp_job_time:
                         machines[m][1] = comp_job_time               
                     if (opp_id < len(jobs[job_id][0])):
-
-                        result.append([job_id, opp_id, machines[m][1]])
                         jobs[job_id][1] = jobs[job_id][1] + 1 #curr opp iterated
                         comp_job_time = machines[m][1] + machine_time
                         jobs[job_id][2] = comp_job_time
                         machines[m][1] = comp_job_time
+                        result.append([job_id, opp_id, machines[m][1]])
 
     print(machines)
+    #print(len(result))
     return result
 
+start = time.time()
 print(schedule())
+end = time.time()
+
+print(end-start)
 
 
